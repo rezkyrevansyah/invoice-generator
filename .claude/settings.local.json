@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/REVAN/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/8ecba98d-6967-4684-96e1-3bdb49372893/84ed387b-4300-4915-b5e7-23ddbe7feb1c/skills/docx/**)",
+      "Bash(pandoc --track-changes=all \"D:\\\\fastwork\\\\Invoice_and_Work_Agreement_TEMPLATE.docx\" -o output.md)",
+      "Bash(node:*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

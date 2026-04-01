@@ -1,0 +1,80 @@
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 15mm; /* slightly tighter than before for more content area */
+  }
+
+  /* Hide all UI when printing */
+  .no-print,
+  .stepper,
+  .form-panel,
+  .print-btn,
+  .preview-controls {
+    display: none !important;
+  }
+
+  /* Preview panel and its body wrapper become full width, no padding */
+  .preview-panel,
+  .preview-body {
+    width: 100% !important;
+    padding: 0 !important;
+    background: none !important;
+  }
+
+  /*
+    Reset the preview zoom scaler.
+    On screen: zoom = containerWidth / 794 (scales to fit panel).
+    On print:  zoom = 1 so content renders at natural A4 size.
+  */
+  .preview-scaler {
+    zoom: 1 !important;
+    width: 100% !important;
+  }
+
+  /*
+    Page elements: remove element padding (replaced by @page margins above)
+    and apply a slight zoom-out so the full content fits on one A4 page each.
+
+    Without this, the elements would have their screen padding ADDED to the
+    @page margins, wasting ~10mm on each side and causing content overflow.
+
+    zoom: 0.85 gives ~15% compression — enough for the invoice + agreement
+    content to each fit comfortably within one A4 page.
+  */
+  .invoice-page,
+  .agreement-page {
+    padding: 0 !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    zoom: 0.85 !important;
+  }
+
+  /* Page break between page 1 and page 2 */
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  /* Selective print: invoice only */
+  [data-print-target="invoice"] .agreement-page {
+    display: none !important;
+  }
+
+  /* Selective print: agreement only */
+  [data-print-target="agreement"] .invoice-page {
+    display: none !important;
+  }
+
+  /* Ensure background colors print correctly */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Prevent tables from splitting across pages */
+  table,
+  tr,
+  td {
+    page-break-inside: avoid;
+  }
+}
