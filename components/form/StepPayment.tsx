@@ -44,7 +44,7 @@ export default function StepPayment({
       {/* Option A */}
       <button
         type="button"
-        onClick={() => onChange('paymentOption', 'A')}
+        onClick={() => onChange('paymentOption', data.paymentOption === 'A' ? null : 'A')}
         className="text-left w-full rounded-xl border-2 p-4 transition-colors"
         style={
           data.paymentOption === 'A'
@@ -67,7 +67,7 @@ export default function StepPayment({
       {/* Option B */}
       <button
         type="button"
-        onClick={() => onChange('paymentOption', 'B')}
+        onClick={() => onChange('paymentOption', data.paymentOption === 'B' ? null : 'B')}
         className="text-left w-full rounded-xl border-2 p-4 transition-colors"
         style={
           data.paymentOption === 'B'
