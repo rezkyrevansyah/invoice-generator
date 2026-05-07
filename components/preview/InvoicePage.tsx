@@ -170,11 +170,9 @@ export default function InvoicePage({ data, freelancer }: InvoicePageProps) {
                 {optA ? '☑' : '☐'} OPTION A: FULL PAYMENT 100%
               </div>
               <ul style={{ margin: '0 0 0 14px', padding: 0, fontSize: 10, color: '#333', lineHeight: 1.6 }}>
-                <li>Total payment 100% sesuai nilai kontrak di atas dibayar di awal sebelum pekerjaan dimulai atau sebelum preview pertama diserahkan</li>
-                <li>Pembayaran harus dilakukan maksimal sesuai Initial Payment Due yang tercantum di atas</li>
-                <li>Pekerjaan dimulai segera setelah konfirmasi pembayaran diterima</li>
-                <li>Priority response time dan faster turnaround untuk opsi ini</li>
-                <li>100% dilindungi Work Agreement - full refund guarantee jika project tidak selesai sesuai ketentuan</li>
+                <li>Total payment 100% sesuai nilai kontrak di atas dibayar di awal sebelum pekerjaan dimulai</li>
+                <li>Project dapat langsung running setelah pembayaran terkonfirmasi</li>
+                <li>Workflow tidak perlu berhenti di tengah jalan untuk menunggu pembayaran ke-2</li>
               </ul>
             </div>
           )}
@@ -187,13 +185,9 @@ export default function InvoicePage({ data, freelancer }: InvoicePageProps) {
               </div>
               <ul style={{ margin: '0 0 0 14px', padding: 0, fontSize: 10, color: '#333', lineHeight: 1.6 }}>
                 <li>DP (Down Payment): 50% dari nilai kontrak dibayar di awal sebelum pekerjaan dimulai</li>
-                <li>Pelunasan: 50% sisanya dibayar saat progress mencapai 70% dari total scope of work</li>
-                <li>DP harus dibayar maksimal sesuai Initial Payment Due yang tercantum di atas</li>
                 <li>Pekerjaan dimulai setelah DP diterima</li>
-                <li>Pelunasan dibayar saat progress mencapai 70% (akan dikonfirmasi via progress report)</li>
-                <li>Final deliverables diserahkan setelah pelunasan 100% diterima</li>
-                <li>DP bersifat non-refundable jika client membatalkan project di tengah jalan (setelah pekerjaan dimulai)</li>
-                <li>DP wajib dikembalikan 100% jika freelancer tidak menyelesaikan hingga tahap 70%</li>
+                <li>Pembayaran ke-2 / pelunasan 50% dilakukan setelah progress 50% selesai</li>
+                <li>Progress 50% berikutnya dilanjutkan setelah pelunasan diterima terlebih dahulu</li>
               </ul>
             </div>
           )}

@@ -136,14 +136,14 @@ export default function AgreementPage({ data, freelancer }: AgreementPageProps) 
           <p style={{ margin: '0 0 3px', fontWeight: 600 }}>KONSEKUENSI HUKUM:</p>
           <ul style={{ ...PASAL_BODY, marginBottom: 6 }}>
             <li>Option A: Pihak Pertama berhak menuntut pengembalian dana 100% + ganti rugi (KUHPerdata Pasal 1243)</li>
-            <li>Option B: Jika wanprestasi sebelum 70% → refund DP 100%. Jika setelah 70% → refund total dana + ganti rugi</li>
+            <li>Option B: Jika wanprestasi sebelum progress 50% selesai, DP dikembalikan 100%. Jika setelah pelunasan diterima, refund mengikuti total dana yang sudah dibayarkan + ganti rugi sesuai ketentuan hukum</li>
             <li>Tindakan Hukum: Dokumen ini memiliki kekuatan hukum yang sah, dapat dilaporkan ke polisi (Pasal 378 KUHP) dan pengadilan</li>
           </ul>
 
           <p style={{ margin: '0 0 3px', fontWeight: 600 }}>WANPRESTASI DARI PIHAK PERTAMA (CLIENT):</p>
           <ul style={PASAL_BODY}>
             <li>Tidak bayar awal: Perjanjian batal, Pihak Kedua tidak wajib mulai pekerjaan</li>
-            <li>Tidak bayar pelunasan (Option B): Pihak Kedua stop pekerjaan, DP jadi kompensasi untuk 70% yang selesai</li>
+            <li>Tidak bayar pelunasan (Option B): Pihak Kedua menghentikan pekerjaan setelah progress 50%, dan DP menjadi kompensasi untuk progress yang sudah diselesaikan</li>
             <li>Pembatalan sepihak (Option B): DP non-refundable sebagai kompensasi waktu dan tenaga</li>
           </ul>
         </div>

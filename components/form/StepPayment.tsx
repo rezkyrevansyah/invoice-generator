@@ -59,8 +59,8 @@ export default function StepPayment({
           </span>
         </div>
         <p className="text-xs text-slate-500 leading-relaxed">
-          Pembayaran 100% di awal sebelum pekerjaan dimulai atau sebelum preview pertama diserahkan.
-          Priority response time dan faster turnaround. Full refund guarantee jika project tidak selesai.
+          Pembayaran 100% di awal agar project bisa langsung running setelah terkonfirmasi,
+          tanpa perlu berhenti untuk menunggu pembayaran ke-2.
         </p>
       </button>
 
@@ -82,8 +82,8 @@ export default function StepPayment({
           </span>
         </div>
         <p className="text-xs text-slate-500 leading-relaxed">
-          DP 50% di awal sebelum pekerjaan dimulai. Pelunasan 50% saat progress mencapai 70% dari
-          total scope of work. Final deliverables diserahkan setelah pelunasan diterima.
+          DP 50% di awal sebelum pekerjaan dimulai. Pembayaran ke-2 dilakukan setelah progress
+          50% selesai, lalu progress berikutnya dilanjutkan setelah pelunasan diterima.
         </p>
       </button>
 
