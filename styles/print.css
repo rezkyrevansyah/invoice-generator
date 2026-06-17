@@ -16,6 +16,7 @@
   /* Preview panel and its body wrapper become full width, no padding */
   .preview-panel,
   .preview-body {
+    display: block !important;
     width: 100% !important;
     padding: 0 !important;
     background: none !important;

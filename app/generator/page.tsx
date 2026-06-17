@@ -250,7 +250,7 @@ export default function GeneratorPage() {
 
       {/* ── Right: Preview panel — hidden on mobile ───────────────────────────── */}
       <div
-        className="preview-panel hidden lg:block w-full lg:w-[55%] lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
+        className="preview-panel hidden lg:block print:block w-full lg:w-[55%] lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
         style={{ backgroundColor: '#f1f5f9' }}
         data-print-target={printTarget}
       >
