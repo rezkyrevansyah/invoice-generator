@@ -50,3 +50,20 @@ CREATE TABLE public.settlement_invoices (
   CONSTRAINT settlement_invoices_pkey PRIMARY KEY (id),
   CONSTRAINT settlement_invoices_original_invoice_id_fkey FOREIGN KEY (original_invoice_id) REFERENCES public.invoices(id)
 );
+CREATE TABLE public.standalone_reimbursements (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  reimbursement_number text NOT NULL,
+  reimbursement_date date NOT NULL,
+  client_company text NOT NULL,
+  client_pic text NOT NULL,
+  project_name text NOT NULL,
+  reimbursement_items jsonb NOT NULL DEFAULT '[]'::jsonb,
+  reimbursement_total bigint NOT NULL DEFAULT 0,
+  bank text NOT NULL,
+  account_number text NOT NULL,
+  account_name text NOT NULL,
+  proof_image_urls text[] NOT NULL DEFAULT '{}'::text[],
+  CONSTRAINT standalone_reimbursements_pkey PRIMARY KEY (id)
+);

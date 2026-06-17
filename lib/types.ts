@@ -84,3 +84,21 @@ export interface SettlementDraft {
   formData: SettlementFormData;
   savedAt: string; // ISO 8601
 }
+
+export interface ReimbursementOnlyFormData {
+  reimbursementNumber: string;   // RMB/2026/06/001
+  reimbursementDate: string;     // YYYY-MM-DD
+  clientCompany: string;
+  clientPIC: string;
+  projectName: string;
+  reimbursementItems: ReimbursementItem[];
+  imageUrls: string[];
+  bank: string;
+  accountNumber: string;
+  accountName: string;
+}
+
+export interface ReimbursementOnlyDraft {
+  formData: ReimbursementOnlyFormData;
+  savedAt: string; // ISO 8601
+}

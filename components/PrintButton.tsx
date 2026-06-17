@@ -7,7 +7,7 @@ import { useDownloadPdf } from '@/hooks/useDownloadPdf';
 interface PrintButtonProps {
   printTarget: PrintTarget;
   onChangePrintTarget: (target: PrintTarget) => void;
-  variant?: 'default' | 'settlement';
+  variant?: 'default' | 'settlement' | 'reimbursement';
   filename?: string;
 }
 
@@ -39,8 +39,8 @@ export default function PrintButton({
   }
 
   async function handleDownload() {
-    const pdfTarget = variant === 'settlement' ? 'settlement' : printTarget;
-    const defaultName = variant === 'settlement' ? 'settlement.pdf' : `${printTarget}.pdf`;
+    const pdfTarget = variant === 'settlement' ? 'settlement' : variant === 'reimbursement' ? 'reimbursement' : printTarget;
+    const defaultName = variant === 'settlement' ? 'settlement.pdf' : variant === 'reimbursement' ? 'reimbursement.pdf' : `${printTarget}.pdf`;
     await downloadPdf(pdfTarget, filename ?? defaultName);
   }
 
@@ -98,7 +98,7 @@ export default function PrintButton({
                 <div>
                   <h3 className="text-base font-semibold text-slate-800">Print Dokumen</h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    {variant === 'settlement' ? 'Invoice Pelunasan akan dicetak' : 'Pilih dokumen yang ingin dicetak'}
+                    {variant === 'settlement' ? 'Invoice Pelunasan akan dicetak' : variant === 'reimbursement' ? 'Reimbursement Invoice akan dicetak' : 'Pilih dokumen yang ingin dicetak'}
                   </p>
                 </div>
                 <button

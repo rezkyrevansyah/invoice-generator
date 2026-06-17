@@ -1,0 +1,240 @@
+import type { FreelancerData, ReimbursementOnlyFormData } from '@/lib/types';
+import { formatRupiah, formatRupiahWords, formatDateID } from '@/lib/utils';
+
+interface Props {
+  data: ReimbursementOnlyFormData;
+  freelancer: FreelancerData;
+  previewImageUrls?: string[];
+}
+
+function isPdfUrl(url: string) {
+  const lower = url.toLowerCase();
+  return lower.endsWith('.pdf') || lower.endsWith('#pdf') || lower.includes('application%2fpdf');
+}
+
+const CELL_LABEL: React.CSSProperties = {
+  backgroundColor: '#E1F5EE',
+  color: '#085041',
+  fontWeight: 600,
+  padding: '6px 10px',
+  fontSize: '11px',
+  lineHeight: '1.5',
+  whiteSpace: 'nowrap',
+  border: '1px solid #c5e8da',
+  verticalAlign: 'middle',
+};
+
+const CELL_VALUE: React.CSSProperties = {
+  padding: '6px 10px',
+  fontSize: '11px',
+  lineHeight: '1.5',
+  border: '1px solid #e5e7eb',
+  verticalAlign: 'middle',
+};
+
+export default function ReimbursementInvoicePage({ data, freelancer, previewImageUrls }: Props) {
+  const total = data.reimbursementItems.reduce((sum, i) => sum + i.amount, 0);
+  const allUrls = previewImageUrls && previewImageUrls.length > 0 ? previewImageUrls : data.imageUrls;
+  const imageUrls = allUrls.filter((u) => !isPdfUrl(u));
+  const pdfUrls = allUrls.filter((u) => isPdfUrl(u));
+
+  return (
+    <div
+      className="reimbursement-page"
+      style={{
+        fontFamily: 'Arial, sans-serif',
+        color: '#1a1a1a',
+        backgroundColor: '#fff',
+        padding: '48px 60px',
+        width: '794px',
+        boxSizing: 'border-box',
+      }}
+    >
+      {/* ── HEADER ─────────────────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 16 }}>
+        <h1 style={{ fontSize: 18, fontWeight: 700, margin: 0, letterSpacing: '0.03em' }}>
+          REIMBURSEMENT
+        </h1>
+        <p style={{ fontSize: 11, fontStyle: 'italic', color: '#555', margin: '3px 0 6px' }}>
+          Reimbursement Invoice
+        </p>
+        <div style={{ height: 3, backgroundColor: '#0F6E56', borderRadius: 2 }} />
+      </div>
+
+      {/* ── INFO DOKUMEN ────────────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 12 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+          <tbody>
+            <tr>
+              <td style={CELL_LABEL}>Reimbursement Number</td>
+              <td style={CELL_VALUE}>{data.reimbursementNumber || '—'}</td>
+              <td style={CELL_LABEL}>Date</td>
+              <td style={CELL_VALUE}>{formatDateID(data.reimbursementDate)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── FROM / TO ───────────────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 12 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+          <thead>
+            <tr>
+              <th style={{ ...CELL_LABEL, textAlign: 'left', width: '50%' }}>FROM</th>
+              <th style={{ ...CELL_LABEL, textAlign: 'left', width: '50%' }}>TO</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ ...CELL_VALUE, verticalAlign: 'top' }}>
+                <div style={{ fontWeight: 700 }}>{freelancer.name}</div>
+                <div style={{ color: '#555' }}>{freelancer.title}</div>
+                <div style={{ fontStyle: 'italic', color: '#777' }}>Experience: {freelancer.experience}</div>
+              </td>
+              <td style={{ ...CELL_VALUE, verticalAlign: 'top' }}>
+                <div style={{ fontWeight: 700 }}>{data.clientCompany || '—'}</div>
+                <div style={{ color: '#555' }}>Attn: {data.clientPIC || '—'} (PIC)</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── PROJECT ─────────────────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 12 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+          <tbody>
+            <tr>
+              <td style={{ ...CELL_LABEL, width: '28%' }}>Project / Keterangan</td>
+              <td style={CELL_VALUE}>{data.projectName || '—'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── RINCIAN REIMBURSEMENT ───────────────────────────────────────────── */}
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontWeight: 700, fontSize: 11, marginBottom: 4, color: '#085041' }}>
+          RINCIAN REIMBURSEMENT
+        </div>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+          <tbody>
+            {data.reimbursementItems.map((item) => (
+              <tr key={item.id}>
+                <td style={{ ...CELL_VALUE, width: '60%' }}>{item.description}</td>
+                <td style={CELL_VALUE}>{formatRupiah(item.amount)}</td>
+              </tr>
+            ))}
+            {data.reimbursementItems.length === 0 && (
+              <tr>
+                <td colSpan={2} style={{ ...CELL_VALUE, color: '#aaa', fontStyle: 'italic' }}>
+                  Belum ada item
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── TOTAL ───────────────────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 12 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+          <tbody>
+            <tr>
+              <td style={{ ...CELL_LABEL, backgroundColor: '#0F6E56', color: '#fff', fontSize: 12, fontWeight: 700, width: '60%' }}>
+                TOTAL REIMBURSEMENT
+              </td>
+              <td style={{ ...CELL_VALUE, backgroundColor: '#E1F5EE', fontSize: 13, fontWeight: 700 }}>
+                {formatRupiah(total)}
+              </td>
+            </tr>
+            <tr>
+              <td style={CELL_LABEL}>Terbilang</td>
+              <td style={{ ...CELL_VALUE, fontStyle: 'italic', color: '#444' }}>
+                {formatRupiahWords(total)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── BANK INFO ───────────────────────────────────────────────────────── */}
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontWeight: 700, fontSize: 11, marginBottom: 4, color: '#085041' }}>
+          Transfer ke Rekening:
+        </div>
+        <table style={{ borderCollapse: 'collapse', fontSize: 11 }}>
+          <tbody>
+            <tr>
+              <td style={{ ...CELL_LABEL, width: 130 }}>Bank</td>
+              <td style={CELL_VALUE}>: {data.bank}</td>
+            </tr>
+            <tr>
+              <td style={CELL_LABEL}>Nomor Rekening</td>
+              <td style={{ ...CELL_VALUE, fontWeight: 700 }}>: {data.accountNumber}</td>
+            </tr>
+            <tr>
+              <td style={CELL_LABEL}>Nama Pemilik</td>
+              <td style={CELL_VALUE}>: {data.accountName}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {/* ── BUKTI — Gambar ──────────────────────────────────────────────────── */}
+      {imageUrls.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontWeight: 700, fontSize: 11, marginBottom: 8, color: '#085041' }}>
+            BUKTI REIMBURSEMENT
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+            {imageUrls.map((url, i) => (
+              <div key={i} style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt={`Bukti ${i + 1}`}
+                  style={{ width: '100%', maxHeight: 220, objectFit: 'contain', border: '1px solid #e5e7eb', borderRadius: 6, display: 'block' }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── BUKTI — PDF ─────────────────────────────────────────────────────── */}
+      {pdfUrls.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontWeight: 700, fontSize: 11, marginBottom: 8, color: '#085041' }}>
+            {imageUrls.length > 0 ? 'DOKUMEN PENDUKUNG (PDF)' : 'BUKTI REIMBURSEMENT (PDF)'}
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+            <tbody>
+              {pdfUrls.map((url, i) => (
+                <tr key={i} style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+                  <td style={{ ...CELL_LABEL, width: 32 }}>#{i + 1}</td>
+                  <td style={CELL_VALUE}>
+                    <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: '#0F6E56', wordBreak: 'break-all' }}>
+                      {url.split('/').pop()?.split('?')[0] ?? `Dokumen PDF ${i + 1}`}
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p style={{ fontSize: 9, color: '#888', marginTop: 4, fontStyle: 'italic' }}>
+            * Buka tautan di atas untuk melihat dokumen PDF
+          </p>
+        </div>
+      )}
+
+      {/* ── FOOTER ──────────────────────────────────────────────────────────── */}
+      <div style={{ textAlign: 'center', borderTop: '2px solid #0F6E56', paddingTop: 12 }}>
+        <div style={{ fontWeight: 700, fontSize: 12 }}>Thank you for your trust and business!</div>
+        <div style={{ fontStyle: 'italic', fontSize: 11, color: '#555', marginTop: 2 }}>
+          Looking forward to delivering excellent results
+        </div>
+      </div>
+    </div>
+  );
+}

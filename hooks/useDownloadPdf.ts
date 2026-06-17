@@ -36,7 +36,7 @@ function cloneOutside(el: HTMLElement): HTMLDivElement {
 export function useDownloadPdf() {
   const [isGenerating, setIsGenerating] = useState(false);
 
-  async function downloadPdf(target: PrintTarget | 'settlement', filename = 'document.pdf') {
+  async function downloadPdf(target: PrintTarget | 'settlement' | 'reimbursement', filename = 'document.pdf') {
     setIsGenerating(true);
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,6 +57,12 @@ export function useDownloadPdf() {
 
       } else if (target === 'settlement') {
         const el = document.querySelector('.settlement-invoice-page') as HTMLElement;
+        const wrapper = cloneOutside(el);
+        try { await html2pdf().set(opts).from(wrapper.firstChild).save(); }
+        finally { document.body.removeChild(wrapper); }
+
+      } else if (target === 'reimbursement') {
+        const el = document.querySelector('.reimbursement-page') as HTMLElement;
         const wrapper = cloneOutside(el);
         try { await html2pdf().set(opts).from(wrapper.firstChild).save(); }
         finally { document.body.removeChild(wrapper); }

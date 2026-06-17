@@ -90,7 +90,7 @@ export function formatRupiahWords(amount: number): string {
 
 // ─── Validasi Step ────────────────────────────────────────────────────────────
 
-import type { InvoiceFormData, SettlementFormData } from './types';
+import type { InvoiceFormData, SettlementFormData, ReimbursementOnlyFormData } from './types';
 
 export function validateStep(step: number, data: InvoiceFormData): string[] {
   const errors: string[] = [];
@@ -114,6 +114,13 @@ export function validateStep(step: number, data: InvoiceFormData): string[] {
 
 // ─── Settlement Number ────────────────────────────────────────────────────────
 
+export function generateReimbursementNumber(date: Date): string {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const counter = getAndIncrementCounter(`reimbursement-counter-${yyyy}-${mm}`);
+  return `RMB/${yyyy}/${mm}/${padCounter(counter)}`;
+}
+
 export function generateSettlementNumber(date: Date): string {
   const yyyy = date.getFullYear();
   const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -134,6 +141,22 @@ export function validateSettlement(data: SettlementFormData): string[] {
   for (const item of data.reimbursementItems) {
     if (!item.description.trim()) errors.push('Deskripsi reimbursement tidak boleh kosong.');
     if (item.amount <= 0) errors.push('Nominal reimbursement harus lebih dari 0.');
+  }
+  return errors;
+}
+
+// ─── Validasi Reimbursement ───────────────────────────────────────────────────
+
+export function validateReimbursement(data: ReimbursementOnlyFormData): string[] {
+  const errors: string[] = [];
+  if (!data.reimbursementDate) errors.push('Tanggal reimbursement tidak boleh kosong.');
+  if (!data.clientCompany.trim()) errors.push('Nama perusahaan client tidak boleh kosong.');
+  if (!data.clientPIC.trim()) errors.push('Nama PIC tidak boleh kosong.');
+  if (!data.projectName.trim()) errors.push('Nama project / keterangan tidak boleh kosong.');
+  if (data.reimbursementItems.length === 0) errors.push('Minimal satu item reimbursement harus diisi.');
+  for (const item of data.reimbursementItems) {
+    if (!item.description.trim()) errors.push('Deskripsi item tidak boleh kosong.');
+    if (item.amount <= 0) errors.push('Nominal item harus lebih dari 0.');
   }
   return errors;
 }
