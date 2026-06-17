@@ -1,0 +1,52 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.invoices (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  invoice_number text NOT NULL,
+  agreement_number text NOT NULL,
+  invoice_date date NOT NULL,
+  agreement_date date NOT NULL,
+  initial_payment_due date NOT NULL,
+  project_deadline date NOT NULL,
+  client_company text NOT NULL,
+  client_pic text NOT NULL,
+  project_name text NOT NULL,
+  scope_of_work text NOT NULL,
+  deliverables text NOT NULL,
+  revision_rounds integer NOT NULL DEFAULT 2,
+  project_duration integer NOT NULL DEFAULT 14,
+  start_date date NOT NULL,
+  end_date date NOT NULL,
+  progress_update text NOT NULL,
+  project_value bigint NOT NULL DEFAULT 0,
+  payment_option character CHECK (payment_option = ANY (ARRAY['A'::bpchar, 'B'::bpchar])),
+  payment_display text NOT NULL DEFAULT 'both'::text CHECK (payment_display = ANY (ARRAY['both'::text, 'A'::text, 'B'::text, 'none'::text])),
+  CONSTRAINT invoices_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.settlement_invoices (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  settlement_number text NOT NULL,
+  settlement_date date NOT NULL,
+  original_invoice_id uuid,
+  original_invoice_number text NOT NULL,
+  client_company text NOT NULL,
+  client_pic text NOT NULL,
+  project_name text NOT NULL,
+  project_value bigint NOT NULL,
+  dp_amount bigint NOT NULL,
+  remaining_amount bigint NOT NULL,
+  reimbursement_items jsonb NOT NULL DEFAULT '[]'::jsonb,
+  reimbursement_total bigint NOT NULL DEFAULT 0,
+  grand_total bigint NOT NULL,
+  bank text NOT NULL,
+  account_number text NOT NULL,
+  account_name text NOT NULL,
+  proof_image_urls ARRAY NOT NULL DEFAULT '{}'::text[],
+  CONSTRAINT settlement_invoices_pkey PRIMARY KEY (id),
+  CONSTRAINT settlement_invoices_original_invoice_id_fkey FOREIGN KEY (original_invoice_id) REFERENCES public.invoices(id)
+);

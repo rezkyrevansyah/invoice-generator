@@ -42,7 +42,8 @@
     content to each fit comfortably within one A4 page.
   */
   .invoice-page,
-  .agreement-page {
+  .agreement-page,
+  .settlement-invoice-page {
     padding: 0 !important;
     width: 100% !important;
     box-shadow: none !important;

@@ -90,7 +90,7 @@ export function formatRupiahWords(amount: number): string {
 
 // ─── Validasi Step ────────────────────────────────────────────────────────────
 
-import type { InvoiceFormData } from './types';
+import type { InvoiceFormData, SettlementFormData } from './types';
 
 export function validateStep(step: number, data: InvoiceFormData): string[] {
   const errors: string[] = [];
@@ -108,6 +108,32 @@ export function validateStep(step: number, data: InvoiceFormData): string[] {
   }
   if (step === 4) {
     if (!data.paymentOption) errors.push('Pilih salah satu opsi pembayaran.');
+  }
+  return errors;
+}
+
+// ─── Settlement Number ────────────────────────────────────────────────────────
+
+export function generateSettlementNumber(date: Date): string {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const counter = getAndIncrementCounter(`settlement-counter-${yyyy}-${mm}`);
+  return `INV-LNS/${yyyy}/${mm}/${padCounter(counter)}`;
+}
+
+// ─── Validasi Settlement ──────────────────────────────────────────────────────
+
+export function validateSettlement(data: SettlementFormData): string[] {
+  const errors: string[] = [];
+  if (!data.settlementDate) errors.push('Tanggal invoice pelunasan tidak boleh kosong.');
+  if (!data.originalInvoiceNumber.trim()) errors.push('Nomor invoice referensi tidak boleh kosong.');
+  if (!data.clientCompany.trim()) errors.push('Nama perusahaan client tidak boleh kosong.');
+  if (!data.clientPIC.trim()) errors.push('Nama PIC tidak boleh kosong.');
+  if (!data.projectName.trim()) errors.push('Nama project tidak boleh kosong.');
+  if (data.projectValue <= 0) errors.push('Nilai project harus lebih dari 0.');
+  for (const item of data.reimbursementItems) {
+    if (!item.description.trim()) errors.push('Deskripsi reimbursement tidak boleh kosong.');
+    if (item.amount <= 0) errors.push('Nominal reimbursement harus lebih dari 0.');
   }
   return errors;
 }

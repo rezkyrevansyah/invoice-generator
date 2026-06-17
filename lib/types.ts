@@ -36,3 +36,51 @@ export interface InvoiceFormData {
   // Kontrol tampilan payment options di dokumen
   paymentDisplay: 'both' | 'A' | 'B' | 'none';
 }
+
+export interface InvoiceDraft {
+  formData: InvoiceFormData;
+  currentStep: number;
+  savedAt: string; // ISO 8601
+}
+
+export interface ReimbursementItem {
+  id: string;           // crypto.randomUUID() — React key + removal target
+  description: string;
+  amount: number;       // Rupiah integer
+}
+
+export interface SettlementFormData {
+  // Dokumen
+  settlementNumber: string;       // INV-LNS/YYYY/MM/NNN
+  settlementDate: string;         // YYYY-MM-DD
+
+  // Referensi ke invoice asli
+  originalInvoiceId: string;      // uuid dari invoices table
+  originalInvoiceNumber: string;  // INV/YYYY/MM/NNN
+
+  // Snapshot client & project (editable)
+  clientCompany: string;
+  clientPIC: string;
+  projectName: string;
+  projectValue: number;
+
+  // Computed (derived dari projectValue, selalu projectValue / 2)
+  dpAmount: number;
+  remainingAmount: number;
+
+  // Reimbursement
+  reimbursementItems: ReimbursementItem[];
+
+  // Images — hanya URLs (File[] disimpan di state terpisah, tidak serializable)
+  imageUrls: string[];
+
+  // Bank info snapshot dari FreelancerData
+  bank: string;
+  accountNumber: string;
+  accountName: string;
+}
+
+export interface SettlementDraft {
+  formData: SettlementFormData;
+  savedAt: string; // ISO 8601
+}

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import Stepper from '@/components/Stepper';
 import StepInfo from '@/components/form/StepInfo';
 import StepClient from '@/components/form/StepClient';
@@ -8,10 +9,15 @@ import StepProject from '@/components/form/StepProject';
 import StepPayment from '@/components/form/StepPayment';
 import DocumentPreview from '@/components/preview/DocumentPreview';
 import PrintButton from '@/components/PrintButton';
+import DraftBanner from '@/components/DraftBanner';
+import DraftIndicator from '@/components/DraftIndicator';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useDraft } from '@/hooks/useDraft';
 import { defaultFormData, defaultFreelancerData } from '@/lib/defaults';
 import { validateStep } from '@/lib/utils';
 import type { FreelancerData, InvoiceFormData } from '@/lib/types';
+
+type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 export type PrintTarget = 'both' | 'invoice' | 'agreement';
 
@@ -24,11 +30,25 @@ export default function GeneratorPage() {
   );
   const [errors, setErrors] = useState<string[]>([]);
   const [printTarget, setPrintTarget] = useState<PrintTarget>('both');
+  const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [savedId, setSavedId] = useState<string | null>(null);
+
+  const [restoredDraft, saveDraft, clearDraft] = useDraft();
+  const [showBanner, setShowBanner] = useState(true);
+  // Guard: don't write draft on initial mount with blank default state
+  const shouldSaveDraft = useRef(false);
+
+  // Auto-save effect — fires when formData or currentStep changes
+  useEffect(() => {
+    if (!shouldSaveDraft.current) return;
+    saveDraft({ formData, currentStep });
+  }, [formData, currentStep, saveDraft]);
 
   function handleChange(
     field: keyof InvoiceFormData,
     value: InvoiceFormData[keyof InvoiceFormData]
   ) {
+    shouldSaveDraft.current = true;
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
@@ -44,13 +64,53 @@ export default function GeneratorPage() {
     }
     setErrors([]);
     if (currentStep < 4) {
+      shouldSaveDraft.current = true;
       setCurrentStep((prev) => prev + 1);
     }
   }
 
   function handleBack() {
     setErrors([]);
+    shouldSaveDraft.current = true;
     setCurrentStep((prev) => prev - 1);
+  }
+
+  function handleContinueDraft() {
+    if (!restoredDraft) return;
+    setFormData(restoredDraft.formData);
+    setCurrentStep(restoredDraft.currentStep);
+    setShowBanner(false);
+    shouldSaveDraft.current = true;
+  }
+
+  function handleDiscardDraft() {
+    clearDraft();
+    setShowBanner(false);
+    shouldSaveDraft.current = true;
+  }
+
+  async function handleSave() {
+    const errs = validateStep(4, formData);
+    if (errs.length > 0) {
+      setErrors(errs);
+      return;
+    }
+    setSaveState('saving');
+    try {
+      const res = await fetch('/api/invoices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Gagal menyimpan');
+      setSavedId(json.id);
+      setSaveState('saved');
+      clearDraft();
+      shouldSaveDraft.current = false;
+    } catch {
+      setSaveState('error');
+    }
   }
 
   return (
@@ -75,9 +135,21 @@ export default function GeneratorPage() {
           </div>
           <div>
             <h1 className="text-sm font-semibold text-slate-800">Invoice Generator</h1>
-            <p className="text-xs text-slate-400">Freelance Invoice & Work Agreement</p>
+            {restoredDraft && !showBanner
+              ? <DraftIndicator savedAt={restoredDraft.savedAt} />
+              : <p className="text-xs text-slate-400">Freelance Invoice &amp; Work Agreement</p>
+            }
           </div>
         </div>
+
+        {/* Draft restore banner */}
+        {restoredDraft && showBanner && (
+          <DraftBanner
+            draft={restoredDraft}
+            onContinue={handleContinueDraft}
+            onDiscard={handleDiscardDraft}
+          />
+        )}
 
         {/* Stepper + Form content */}
         <div className="flex-1 px-6 lg:px-8 py-6 flex flex-col gap-6">
@@ -139,15 +211,41 @@ export default function GeneratorPage() {
             ← Kembali
           </button>
 
-          <button
-            onClick={handleNext}
-            disabled={currentStep === 4}
-            className="flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ backgroundColor: '#0F6E56' }}
-          >
-            {currentStep < 4 ? 'Lanjut →' : 'Selesai'}
-          </button>
+          {currentStep < 4 ? (
+            <button
+              onClick={handleNext}
+              className="flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity"
+              style={{ backgroundColor: '#0F6E56' }}
+            >
+              Lanjut →
+            </button>
+          ) : (
+            <button
+              onClick={handleSave}
+              disabled={saveState === 'saving' || saveState === 'saved'}
+              className="flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ backgroundColor: saveState === 'saved' ? '#16a34a' : saveState === 'error' ? '#dc2626' : '#0F6E56' }}
+            >
+              {saveState === 'saving' && 'Menyimpan...'}
+              {saveState === 'saved' && 'Tersimpan ✓'}
+              {saveState === 'error' && 'Gagal — Coba Lagi'}
+              {saveState === 'idle' && 'Simpan Invoice'}
+            </button>
+          )}
         </div>
+
+        {/* Link ke History setelah save sukses */}
+        {saveState === 'saved' && (
+          <div className="no-print px-6 lg:px-8 pb-4">
+            <Link
+              href="/history"
+              className="block w-full text-center px-5 py-2.5 rounded-xl text-sm font-medium border transition-colors"
+              style={{ borderColor: '#0F6E56', color: '#0F6E56' }}
+            >
+              Lihat History Invoice →
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* ── Right: Preview panel ──────────────────────────────────────────────── */}

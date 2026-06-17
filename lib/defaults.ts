@@ -1,4 +1,4 @@
-import type { FreelancerData, InvoiceFormData } from './types';
+import type { FreelancerData, InvoiceFormData, SettlementFormData } from './types';
 
 export const defaultFreelancerData: FreelancerData = {
   name: 'M. Rezky Revansyah Suprihono',
@@ -35,4 +35,22 @@ export const defaultFormData: InvoiceFormData = {
 
   paymentOption: null,
   paymentDisplay: 'both',
+};
+
+export const defaultSettlementFormData: SettlementFormData = {
+  settlementNumber: '',
+  settlementDate: today,
+  originalInvoiceId: '',
+  originalInvoiceNumber: '',
+  clientCompany: '',
+  clientPIC: '',
+  projectName: '',
+  projectValue: 0,
+  dpAmount: 0,
+  remainingAmount: 0,
+  reimbursementItems: [],
+  imageUrls: [],
+  bank: defaultFreelancerData.bank,
+  accountNumber: defaultFreelancerData.accountNumber,
+  accountName: defaultFreelancerData.accountName,
 };
