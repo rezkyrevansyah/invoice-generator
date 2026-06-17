@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
 
 const NAV_ITEMS = [
   {
@@ -44,6 +45,17 @@ const NAV_ITEMS = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Hide navbar on login page
+  if (pathname === '/login') return null;
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  }
 
   return (
     <nav
@@ -71,6 +83,19 @@ export default function Navbar() {
           </Link>
         );
       })}
+
+      {/* Logout */}
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-1.5 px-2.5 py-2 sm:px-3 rounded-xl text-xs font-semibold transition-all"
+        style={{ color: '#64748b' }}
+        title="Logout"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+        <span className="hidden sm:inline">Logout</span>
+      </button>
     </nav>
   );
 }
