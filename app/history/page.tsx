@@ -137,6 +137,12 @@ export default async function HistoryPage() {
 
                   {/* Actions */}
                   <div className="flex flex-col gap-2 flex-shrink-0">
+                    <Link
+                      href={`/invoice/${invoice.id}`}
+                      className="px-4 py-2 text-xs font-medium text-slate-600 rounded-xl text-center border border-slate-200 hover:bg-slate-50 transition-colors"
+                    >
+                      Lihat &amp; Edit
+                    </Link>
                     {isOptB && !hasSett && (
                       <Link
                         href={`/settlement?id=${invoice.id}`}

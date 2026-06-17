@@ -159,9 +159,10 @@ export default function SettlementFormPanel({
             value={data.projectValue || ''}
             onChange={(e) => {
               const val = Number(e.target.value);
+              const dp = Math.floor(val / 2);
               onChange('projectValue', val);
-              onChange('dpAmount', Math.floor(val / 2));
-              onChange('remainingAmount', Math.floor(val / 2));
+              onChange('dpAmount', dp);
+              onChange('remainingAmount', val - dp);
             }}
             className={INPUT_CLASS}
             style={INPUT_STYLE}
@@ -171,6 +172,39 @@ export default function SettlementFormPanel({
           )}
         </div>
 
+        {data.projectValue > 0 && (
+          <div>
+            <label className={LABEL_CLASS}>
+              DP yang Telah Dibayar (Rp)
+              <span className="ml-1 font-normal text-slate-400">— bisa diubah sesuai pembayaran aktual</span>
+            </label>
+            <input
+              type="number"
+              min={0}
+              max={data.projectValue}
+              placeholder="0"
+              value={data.dpAmount || ''}
+              onChange={(e) => {
+                const dp = Math.min(Number(e.target.value), data.projectValue);
+                onChange('dpAmount', dp);
+                onChange('remainingAmount', data.projectValue - dp);
+              }}
+              className={INPUT_CLASS}
+              style={INPUT_STYLE}
+            />
+            {data.dpAmount > 0 && (
+              <p className="text-xs text-slate-500 mt-1">
+                {formatRupiah(data.dpAmount)}
+                {data.projectValue > 0 && (
+                  <span className="ml-1 text-slate-400">
+                    ({Math.round((data.dpAmount / data.projectValue) * 100)}% dari total)
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Ringkasan pembayaran */}
         {data.projectValue > 0 && (
           <div className="rounded-xl border border-slate-100 overflow-hidden">
@@ -179,11 +213,21 @@ export default function SettlementFormPanel({
               <span className="text-xs font-medium text-slate-700">{formatRupiah(data.projectValue)}</span>
             </div>
             <div className="px-3 py-2 flex justify-between items-center border-b border-slate-100">
-              <span className="text-xs text-slate-400">DP Telah Dibayar (50%)</span>
+              <span className="text-xs text-slate-400">
+                DP Telah Dibayar
+                {data.projectValue > 0 && data.dpAmount > 0 && (
+                  <span className="ml-1">({Math.round((data.dpAmount / data.projectValue) * 100)}%)</span>
+                )}
+              </span>
               <span className="text-xs text-slate-400">({formatRupiah(data.dpAmount)})</span>
             </div>
             <div className="px-3 py-2 flex justify-between items-center border-b border-slate-100">
-              <span className="text-xs font-semibold text-slate-700">Sisa Pelunasan (50%)</span>
+              <span className="text-xs font-semibold text-slate-700">
+                Sisa Pelunasan
+                {data.projectValue > 0 && data.remainingAmount > 0 && (
+                  <span className="ml-1 font-normal">({Math.round((data.remainingAmount / data.projectValue) * 100)}%)</span>
+                )}
+              </span>
               <span className="text-xs font-semibold text-slate-700">{formatRupiah(data.remainingAmount)}</span>
             </div>
             {reimbursementTotal > 0 && (

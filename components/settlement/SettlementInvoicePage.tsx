@@ -127,14 +127,22 @@ export default function SettlementInvoicePage({ data, freelancer, previewImageUr
             </tr>
             <tr>
               <td style={{ ...CELL_LABEL, color: '#555', fontWeight: 400 }}>
-                DP yang Telah Dibayar (50%)
+                DP yang Telah Dibayar
+                {data.projectValue > 0 && data.dpAmount > 0
+                  ? ` (${Math.round((data.dpAmount / data.projectValue) * 100)}%)`
+                  : ''}
               </td>
               <td style={{ ...CELL_VALUE, color: '#555' }}>
                 ({formatRupiah(data.dpAmount)})
               </td>
             </tr>
             <tr>
-              <td style={{ ...CELL_LABEL, fontWeight: 700 }}>Sisa Pelunasan (50%)</td>
+              <td style={{ ...CELL_LABEL, fontWeight: 700 }}>
+                Sisa Pelunasan
+                {data.projectValue > 0 && data.remainingAmount > 0
+                  ? ` (${Math.round((data.remainingAmount / data.projectValue) * 100)}%)`
+                  : ''}
+              </td>
               <td style={{ ...CELL_VALUE, fontWeight: 700 }}>{formatRupiah(data.remainingAmount)}</td>
             </tr>
           </tbody>
