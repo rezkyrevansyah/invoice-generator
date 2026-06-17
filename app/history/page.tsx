@@ -154,7 +154,7 @@ export default async function HistoryPage() {
                     )}
                     {isOptB && hasSett && (
                       <Link
-                        href={`/settlement?id=${invoice.id}`}
+                        href={`/settlement?settlementId=${settlements[0].id}`}
                         className="px-4 py-2 text-xs font-medium text-slate-600 rounded-xl text-center border border-slate-200 hover:bg-slate-50 transition-colors"
                       >
                         Lihat Pelunasan

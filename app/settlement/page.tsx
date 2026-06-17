@@ -30,6 +30,8 @@ export interface InvoiceOption {
 function SettlementPageInner() {
   const searchParams = useSearchParams();
   const invoiceId = searchParams.get('id') ?? '';
+  const settlementId = searchParams.get('settlementId') ?? '';
+  const isViewMode = !!settlementId;
 
   const [formData, setFormData] = useState<SettlementFormData>(defaultSettlementFormData);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -44,8 +46,21 @@ function SettlementPageInner() {
   const [showBanner, setShowBanner] = useState(true);
   const shouldSaveDraft = useRef(false);
 
+  // Load existing settlement when settlementId is provided
+  useEffect(() => {
+    if (!settlementId) return;
+    fetch(`/api/settlement/${settlementId}`)
+      .then((r) => r.json())
+      .then((data: SettlementFormData) => {
+        setFormData(data);
+        shouldSaveDraft.current = false;
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settlementId]);
+
   // Prefill from original invoice via Supabase client-side fetch
   useEffect(() => {
+    if (settlementId) return; // already loaded above
     if (!invoiceId) {
       // No invoice id — generate settlement number and use defaults
       setFormData((prev) => ({
@@ -236,15 +251,17 @@ function SettlementPageInner() {
           </div>
           <div>
             <h1 className="text-sm font-semibold text-slate-800">Invoice Pelunasan</h1>
-            {restoredDraft && !showBanner
-              ? <DraftIndicator savedAt={restoredDraft.savedAt} />
-              : <p className="text-xs text-slate-400">Settlement Invoice</p>
+            {isViewMode
+              ? <p className="text-xs text-slate-400">Detail Invoice Pelunasan</p>
+              : restoredDraft && !showBanner
+                ? <DraftIndicator savedAt={restoredDraft.savedAt} />
+                : <p className="text-xs text-slate-400">Settlement Invoice</p>
             }
           </div>
         </div>
 
-        {/* Draft restore banner */}
-        {restoredDraft && showBanner && (
+        {/* Draft restore banner — skip when viewing an existing settlement */}
+        {!isViewMode && restoredDraft && showBanner && (
           <DraftBanner
             draft={{ ...restoredDraft, formData: restoredDraft.formData as unknown as import('@/lib/types').InvoiceFormData, currentStep: 1 }}
             onContinue={handleContinueDraft}
@@ -280,35 +297,51 @@ function SettlementPageInner() {
           </div>
         )}
 
-        {/* Save button */}
+        {/* Save / status footer */}
         <div
           className="no-print sticky bottom-0 px-4 sm:px-6 lg:px-8 py-4 border-t border-slate-100"
           style={{ backgroundColor: '#ffffff' }}
         >
-          <button
-            onClick={handleSave}
-            disabled={saveState === 'saving' || saveState === 'saved' || isUploading}
-            className="w-full px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor:
-                saveState === 'saved' ? '#16a34a'
-                : saveState === 'error' ? '#dc2626'
-                : '#0F6E56',
-            }}
-          >
-            {isUploading && 'Mengupload gambar...'}
-            {!isUploading && saveState === 'idle' && 'Simpan Invoice Pelunasan'}
-            {!isUploading && saveState === 'saving' && 'Menyimpan...'}
-            {!isUploading && saveState === 'saved' && 'Tersimpan ✓'}
-            {!isUploading && saveState === 'error' && 'Gagal — Coba Lagi'}
-          </button>
-          {saveState === 'saved' && (
-            <Link
-              href="/history"
-              className="block mt-2 text-center text-sm text-slate-500 hover:text-slate-700 transition-colors"
-            >
-              ← Kembali ke History
-            </Link>
+          {isViewMode ? (
+            <div className="flex flex-col gap-2">
+              <div className="w-full px-5 py-2.5 rounded-xl text-sm font-semibold text-center text-white" style={{ backgroundColor: '#16a34a' }}>
+                Tersimpan ✓
+              </div>
+              <Link
+                href="/history"
+                className="block text-center text-sm text-slate-500 hover:text-slate-700 transition-colors"
+              >
+                ← Kembali ke History
+              </Link>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={handleSave}
+                disabled={saveState === 'saving' || saveState === 'saved' || isUploading}
+                className="w-full px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor:
+                    saveState === 'saved' ? '#16a34a'
+                    : saveState === 'error' ? '#dc2626'
+                    : '#0F6E56',
+                }}
+              >
+                {isUploading && 'Mengupload gambar...'}
+                {!isUploading && saveState === 'idle' && 'Simpan Invoice Pelunasan'}
+                {!isUploading && saveState === 'saving' && 'Menyimpan...'}
+                {!isUploading && saveState === 'saved' && 'Tersimpan ✓'}
+                {!isUploading && saveState === 'error' && 'Gagal — Coba Lagi'}
+              </button>
+              {saveState === 'saved' && (
+                <Link
+                  href="/history"
+                  className="block mt-2 text-center text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                >
+                  ← Kembali ke History
+                </Link>
+              )}
+            </>
           )}
         </div>
       </div>
