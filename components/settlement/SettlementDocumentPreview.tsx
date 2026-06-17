@@ -26,11 +26,17 @@ export default function SettlementDocumentPreview({ data, freelancer, imageFiles
     return () => ro.disconnect();
   }, []);
 
-  // Blob URLs for pending imageFiles preview
+  // Blob URLs for pending files preview
+  // PDF blob URLs get a '#pdf' fragment so isPdfUrl() can detect them
   useEffect(() => {
-    const urls = imageFiles.map((f) => URL.createObjectURL(f));
+    const urls = imageFiles.map((f) => {
+      const blobUrl = URL.createObjectURL(f);
+      return f.type === 'application/pdf' ? `${blobUrl}#pdf` : blobUrl;
+    });
     setBlobUrls(urls);
-    return () => { urls.forEach((u) => URL.revokeObjectURL(u)); };
+    return () => {
+      urls.forEach((u) => URL.revokeObjectURL(u.replace('#pdf', '')));
+    };
   }, [imageFiles]);
 
   const previewImageUrls = [...blobUrls, ...data.imageUrls];

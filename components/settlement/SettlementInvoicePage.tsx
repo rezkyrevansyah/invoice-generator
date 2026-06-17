@@ -8,7 +8,12 @@ import {
 interface Props {
   data: SettlementFormData;
   freelancer: FreelancerData;
-  previewImageUrls?: string[]; // blob URLs for preview before upload
+  previewImageUrls?: string[]; // blob URLs for pending files preview
+}
+
+function isPdfUrl(url: string) {
+  const lower = url.toLowerCase();
+  return lower.endsWith('.pdf') || lower.endsWith('#pdf') || lower.includes('application%2fpdf');
 }
 
 const CELL_LABEL: React.CSSProperties = {
@@ -32,7 +37,9 @@ const CELL_VALUE: React.CSSProperties = {
 export default function SettlementInvoicePage({ data, freelancer, previewImageUrls }: Props) {
   const reimbursementTotal = data.reimbursementItems.reduce((sum, i) => sum + i.amount, 0);
   const grandTotal = data.remainingAmount + reimbursementTotal;
-  const imageUrls = previewImageUrls && previewImageUrls.length > 0 ? previewImageUrls : data.imageUrls;
+  const allUrls = previewImageUrls && previewImageUrls.length > 0 ? previewImageUrls : data.imageUrls;
+  const imageUrls = allUrls.filter((u) => !isPdfUrl(u));
+  const pdfUrls = allUrls.filter((u) => isPdfUrl(u));
 
   return (
     <div
@@ -217,19 +224,13 @@ export default function SettlementInvoicePage({ data, freelancer, previewImageUr
         </table>
       </div>
 
-      {/* ── BUKTI REIMBURSEMENT (optional) ──────────────────────────────────── */}
+      {/* ── BUKTI REIMBURSEMENT — Gambar ────────────────────────────────────── */}
       {imageUrls.length > 0 && (
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontWeight: 700, fontSize: 11, marginBottom: 8, color: '#085041' }}>
             BUKTI REIMBURSEMENT
           </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 8,
-            }}
-          >
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
             {imageUrls.map((url, i) => (
               <div
                 key={i}
@@ -252,6 +253,37 @@ export default function SettlementInvoicePage({ data, freelancer, previewImageUr
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ── BUKTI REIMBURSEMENT — Dokumen PDF ───────────────────────────────── */}
+      {pdfUrls.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontWeight: 700, fontSize: 11, marginBottom: 8, color: '#085041' }}>
+            {imageUrls.length > 0 ? 'DOKUMEN PENDUKUNG (PDF)' : 'BUKTI REIMBURSEMENT (PDF)'}
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+            <tbody>
+              {pdfUrls.map((url, i) => (
+                <tr key={i} style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+                  <td style={{ ...CELL_LABEL, width: 32 }}>#{i + 1}</td>
+                  <td style={CELL_VALUE}>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#0F6E56', wordBreak: 'break-all' }}
+                    >
+                      {url.split('/').pop()?.split('?')[0] ?? `Dokumen PDF ${i + 1}`}
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p style={{ fontSize: 9, color: '#888', marginTop: 4, fontStyle: 'italic' }}>
+            * Buka tautan di atas untuk melihat dokumen PDF
+          </p>
         </div>
       )}
 
