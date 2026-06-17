@@ -18,6 +18,15 @@ import type { PrintTarget } from '@/app/generator/page';
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
+export interface InvoiceOption {
+  id: string;
+  invoiceNumber: string;
+  clientCompany: string;
+  clientPIC: string;
+  projectName: string;
+  projectValue: number;
+}
+
 function SettlementPageInner() {
   const searchParams = useSearchParams();
   const invoiceId = searchParams.get('id') ?? '';
@@ -29,6 +38,7 @@ function SettlementPageInner() {
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [printTarget, setPrintTarget] = useState<PrintTarget>('invoice');
   const [isUploading, setIsUploading] = useState(false);
+  const [invoiceOptions, setInvoiceOptions] = useState<InvoiceOption[]>([]);
 
   const [restoredDraft, saveDraft, clearDraft] = useSettlementDraft();
   const [showBanner, setShowBanner] = useState(true);
@@ -76,6 +86,26 @@ function SettlementPageInner() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [invoiceId]);
 
+  // Fetch all invoices for reference dropdown
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from('invoices')
+      .select('id, invoice_number, client_company, client_pic, project_name, project_value')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        if (!data) return;
+        setInvoiceOptions(data.map((r) => ({
+          id: r.id,
+          invoiceNumber: r.invoice_number,
+          clientCompany: r.client_company,
+          clientPIC: r.client_pic,
+          projectName: r.project_name,
+          projectValue: r.project_value ?? 0,
+        })));
+      });
+  }, []);
+
   // Auto-save draft
   useEffect(() => {
     if (!shouldSaveDraft.current) return;
@@ -88,6 +118,22 @@ function SettlementPageInner() {
   ) {
     shouldSaveDraft.current = true;
     setFormData((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleSelectInvoice(opt: InvoiceOption) {
+    shouldSaveDraft.current = true;
+    const pv = opt.projectValue;
+    setFormData((prev) => ({
+      ...prev,
+      originalInvoiceId: opt.id,
+      originalInvoiceNumber: opt.invoiceNumber,
+      clientCompany: opt.clientCompany,
+      clientPIC: opt.clientPIC,
+      projectName: opt.projectName,
+      projectValue: pv,
+      dpAmount: Math.floor(pv / 2),
+      remainingAmount: Math.floor(pv / 2),
+    }));
   }
 
   function handleContinueDraft() {
@@ -215,6 +261,8 @@ function SettlementPageInner() {
             imageFiles={imageFiles}
             onFilesChange={setImageFiles}
             isUploading={isUploading}
+            invoiceOptions={invoiceOptions}
+            onSelectInvoice={handleSelectInvoice}
           />
         </div>
 

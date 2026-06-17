@@ -3,6 +3,7 @@ import type { FreelancerData, SettlementFormData } from '@/lib/types';
 import { formatRupiah } from '@/lib/utils';
 import ReimbursementEditor from './ReimbursementEditor';
 import ImageUploader from './ImageUploader';
+import type { InvoiceOption } from '@/app/settlement/page';
 
 interface Props {
   data: SettlementFormData;
@@ -11,6 +12,8 @@ interface Props {
   imageFiles: File[];
   onFilesChange: (files: File[]) => void;
   isUploading: boolean;
+  invoiceOptions: InvoiceOption[];
+  onSelectInvoice: (opt: InvoiceOption) => void;
 }
 
 const INPUT_CLASS = 'w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-0 bg-white';
@@ -24,6 +27,8 @@ export default function SettlementFormPanel({
   imageFiles,
   onFilesChange,
   isUploading,
+  invoiceOptions,
+  onSelectInvoice,
 }: Props) {
   const reimbursementTotal = data.reimbursementItems.reduce((s, i) => s + (i.amount || 0), 0);
   const grandTotal = data.remainingAmount + reimbursementTotal;
@@ -60,14 +65,44 @@ export default function SettlementFormPanel({
 
         <div>
           <label className={LABEL_CLASS}>Nomor Invoice Referensi</label>
+          {invoiceOptions.length > 0 && (
+            <select
+              value={data.originalInvoiceId || ''}
+              onChange={(e) => {
+                const opt = invoiceOptions.find((o) => o.id === e.target.value);
+                if (opt) onSelectInvoice(opt);
+                else {
+                  onChange('originalInvoiceId', '');
+                  onChange('originalInvoiceNumber', '');
+                }
+              }}
+              className={INPUT_CLASS + ' mb-2'}
+              style={INPUT_STYLE}
+            >
+              <option value="">— Pilih dari history atau isi manual —</option>
+              {invoiceOptions.map((opt) => (
+                <option key={opt.id} value={opt.id}>
+                  {opt.invoiceNumber} · {opt.clientCompany}
+                </option>
+              ))}
+            </select>
+          )}
           <input
             type="text"
             placeholder="INV/2026/06/001"
             value={data.originalInvoiceNumber}
-            onChange={(e) => onChange('originalInvoiceNumber', e.target.value)}
+            onChange={(e) => {
+              onChange('originalInvoiceId', '');
+              onChange('originalInvoiceNumber', e.target.value);
+            }}
             className={INPUT_CLASS}
             style={INPUT_STYLE}
           />
+          {data.originalInvoiceId && (
+            <p className="text-xs text-slate-400 mt-1">
+              Dipilih dari history · nomor bisa diedit manual di atas
+            </p>
+          )}
         </div>
       </section>
 
