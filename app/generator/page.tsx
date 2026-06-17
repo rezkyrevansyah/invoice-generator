@@ -117,12 +117,12 @@ export default function GeneratorPage() {
     <main className="min-h-screen flex flex-col lg:flex-row bg-slate-50">
       {/* ── Left: Form panel ──────────────────────────────────────────────────── */}
       <div
-        className="form-panel no-print w-full lg:w-[45%] flex flex-col lg:min-h-screen lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
+        className="form-panel no-print w-full lg:w-[45%] flex flex-col min-h-screen lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
         style={{ backgroundColor: '#ffffff', borderRight: '1px solid #e2e8f0' }}
       >
         {/* Header bar */}
         <div
-          className="px-6 lg:px-8 py-4 border-b border-slate-100 flex items-center gap-3"
+          className="sticky top-0 z-10 px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-100 flex items-center gap-3"
           style={{ backgroundColor: '#ffffff' }}
         >
           <div
@@ -152,7 +152,7 @@ export default function GeneratorPage() {
         )}
 
         {/* Stepper + Form content */}
-        <div className="flex-1 px-6 lg:px-8 py-6 flex flex-col gap-6">
+        <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
           <Stepper currentStep={currentStep} />
 
           <div className="flex-1">
@@ -199,7 +199,7 @@ export default function GeneratorPage() {
 
         {/* Navigation buttons */}
         <div
-          className="no-print px-6 lg:px-8 py-4 flex gap-3 border-t border-slate-100"
+          className="no-print sticky bottom-0 px-4 sm:px-6 lg:px-8 py-4 flex gap-3 border-t border-slate-100"
           style={{ backgroundColor: '#ffffff' }}
         >
           <button
@@ -236,7 +236,7 @@ export default function GeneratorPage() {
 
         {/* Link ke History setelah save sukses */}
         {saveState === 'saved' && (
-          <div className="no-print px-6 lg:px-8 pb-4">
+          <div className="no-print px-4 sm:px-6 lg:px-8 pb-4">
             <Link
               href="/history"
               className="block w-full text-center px-5 py-2.5 rounded-xl text-sm font-medium border transition-colors"
@@ -248,9 +248,9 @@ export default function GeneratorPage() {
         )}
       </div>
 
-      {/* ── Right: Preview panel ──────────────────────────────────────────────── */}
+      {/* ── Right: Preview panel — hidden on mobile ───────────────────────────── */}
       <div
-        className="preview-panel w-full lg:w-[55%] lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
+        className="preview-panel hidden lg:block w-full lg:w-[55%] lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
         style={{ backgroundColor: '#f1f5f9' }}
         data-print-target={printTarget}
       >

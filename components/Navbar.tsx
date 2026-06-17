@@ -47,8 +47,11 @@ export default function Navbar() {
 
   return (
     <nav
-      className="no-print fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 px-2 py-1.5 rounded-2xl shadow-lg border border-slate-200"
-      style={{ backgroundColor: '#ffffff' }}
+      className="no-print fixed left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 px-2 py-1.5 rounded-2xl shadow-lg border border-slate-200"
+      style={{
+        backgroundColor: '#ffffff',
+        bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+      }}
     >
       {NAV_ITEMS.map(({ href, label, icon }) => {
         const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
@@ -56,7 +59,7 @@ export default function Navbar() {
           <Link
             key={href}
             href={href}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all"
+            className="flex items-center gap-1.5 px-2.5 py-2 sm:px-3 rounded-xl text-xs font-semibold transition-all"
             style={
               isActive
                 ? { backgroundColor: '#0F6E56', color: '#ffffff' }
@@ -64,7 +67,7 @@ export default function Navbar() {
             }
           >
             {icon}
-            <span>{label}</span>
+            <span className="hidden sm:inline">{label}</span>
           </Link>
         );
       })}

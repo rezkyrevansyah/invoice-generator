@@ -18,7 +18,7 @@ export default function Stepper({ currentStep }: { currentStep: number }) {
             {/* Circle */}
             <div className="flex flex-col items-center">
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 flex-shrink-0"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold border-2 flex-shrink-0"
                 style={
                   isActive
                     ? { backgroundColor: '#0F6E56', borderColor: '#0F6E56', color: '#fff' }
@@ -30,7 +30,7 @@ export default function Stepper({ currentStep }: { currentStep: number }) {
                 {isDone ? '✓' : stepNumber}
               </div>
               <span
-                className="mt-1 text-xs text-center whitespace-nowrap"
+                className="mt-1 text-xs text-center whitespace-nowrap hidden sm:block"
                 style={
                   isActive
                     ? { color: '#0F6E56', fontWeight: 600 }

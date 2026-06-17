@@ -213,12 +213,12 @@ function SettlementPageInner() {
     <main className="min-h-screen flex flex-col lg:flex-row bg-slate-50">
       {/* ── Left: Form panel ──────────────────────────────────────────────────── */}
       <div
-        className="form-panel no-print w-full lg:w-[45%] flex flex-col lg:min-h-screen lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
+        className="form-panel no-print w-full lg:w-[45%] flex flex-col min-h-screen lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
         style={{ backgroundColor: '#ffffff', borderRight: '1px solid #e2e8f0' }}
       >
         {/* Header */}
         <div
-          className="px-6 lg:px-8 py-4 border-b border-slate-100 flex items-center gap-3"
+          className="sticky top-0 z-10 px-4 sm:px-6 lg:px-8 py-4 border-b border-slate-100 flex items-center gap-3"
           style={{ backgroundColor: '#ffffff' }}
         >
           <Link href="/history" className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors flex-shrink-0">
@@ -253,7 +253,7 @@ function SettlementPageInner() {
         )}
 
         {/* Form content */}
-        <div className="flex-1 px-6 lg:px-8 py-6 overflow-y-auto">
+        <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto">
           <SettlementFormPanel
             data={formData}
             onChange={handleChange}
@@ -282,7 +282,7 @@ function SettlementPageInner() {
 
         {/* Save button */}
         <div
-          className="no-print px-6 lg:px-8 py-4 border-t border-slate-100"
+          className="no-print sticky bottom-0 px-4 sm:px-6 lg:px-8 py-4 border-t border-slate-100"
           style={{ backgroundColor: '#ffffff' }}
         >
           <button
@@ -313,9 +313,9 @@ function SettlementPageInner() {
         </div>
       </div>
 
-      {/* ── Right: Preview panel ──────────────────────────────────────────────── */}
+      {/* ── Right: Preview panel — hidden on mobile ───────────────────────────── */}
       <div
-        className="preview-panel w-full lg:w-[55%] lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
+        className="preview-panel hidden lg:block w-full lg:w-[55%] lg:sticky lg:top-0 lg:max-h-screen lg:overflow-y-auto"
         style={{ backgroundColor: '#f1f5f9' }}
         data-print-target={printTarget}
       >

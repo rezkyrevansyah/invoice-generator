@@ -30,8 +30,8 @@ export default async function HistoryPage() {
   return (
     <main className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-100 px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
             style={{ backgroundColor: '#0F6E56' }}
@@ -40,17 +40,18 @@ export default async function HistoryPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
           </div>
-          <div>
+          <div className="min-w-0">
             <h1 className="text-sm font-semibold text-slate-800">History Invoice</h1>
-            <p className="text-xs text-slate-400">Semua invoice yang tersimpan</p>
+            <p className="text-xs text-slate-400 hidden sm:block">Semua invoice yang tersimpan</p>
           </div>
         </div>
         <Link
           href="/generator"
-          className="px-4 py-2 text-sm font-semibold text-white rounded-xl transition-opacity hover:opacity-90"
+          className="flex-shrink-0 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white rounded-xl transition-opacity hover:opacity-90"
           style={{ backgroundColor: '#0F6E56' }}
         >
-          + Buat Invoice Baru
+          <span className="sm:hidden">+ Baru</span>
+          <span className="hidden sm:inline">+ Buat Invoice Baru</span>
         </Link>
       </div>
 
