@@ -8,6 +8,7 @@ import SettlementDocumentPreview from '@/components/settlement/SettlementDocumen
 import DraftBanner from '@/components/DraftBanner';
 import DraftIndicator from '@/components/DraftIndicator';
 import PrintButton from '@/components/PrintButton';
+import { useDownloadPdf } from '@/hooks/useDownloadPdf';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useSettlementDraft } from '@/hooks/useSettlementDraft';
 import { defaultFreelancerData, defaultSettlementFormData } from '@/lib/defaults';
@@ -45,6 +46,7 @@ function SettlementPageInner() {
   const [restoredDraft, saveDraft, clearDraft] = useSettlementDraft();
   const [showBanner, setShowBanner] = useState(true);
   const shouldSaveDraft = useRef(false);
+  const { downloadPdf, isGenerating } = useDownloadPdf();
 
   // Load existing settlement when settlementId is provided
   useEffect(() => {
@@ -304,16 +306,43 @@ function SettlementPageInner() {
         >
           {isViewMode ? (
             <div className="flex flex-col gap-2">
-              <button
-                onClick={() => window.print()}
-                className="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ backgroundColor: '#0F6E56' }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                Download PDF / Print
-              </button>
+              <div className="flex gap-2">
+                {/* Print */}
+                <button
+                  onClick={() => window.print()}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors border"
+                  style={{ borderColor: '#0F6E56', color: '#0F6E56', backgroundColor: '#fff' }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  Print
+                </button>
+                {/* Download PDF */}
+                <button
+                  onClick={() => downloadPdf('settlement', `settlement-${formData.settlementNumber || 'draft'}.pdf`)}
+                  disabled={isGenerating}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: '#0F6E56' }}
+                >
+                  {isGenerating ? (
+                    <>
+                      <svg className="w-4 h-4 flex-shrink-0 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Download PDF
+                    </>
+                  )}
+                </button>
+              </div>
               <Link
                 href="/history"
                 className="block text-center text-sm text-slate-500 hover:text-slate-700 transition-colors"
@@ -366,6 +395,8 @@ function SettlementPageInner() {
           <PrintButton
             printTarget={printTarget}
             onChangePrintTarget={setPrintTarget}
+            variant="settlement"
+            filename={`settlement-${formData.settlementNumber || 'draft'}.pdf`}
           />
         </div>
         <div className="preview-body p-4">

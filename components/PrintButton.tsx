@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import type { PrintTarget } from '@/app/generator/page';
+import { useDownloadPdf } from '@/hooks/useDownloadPdf';
 
 interface PrintButtonProps {
   printTarget: PrintTarget;
   onChangePrintTarget: (target: PrintTarget) => void;
+  variant?: 'default' | 'settlement';
+  filename?: string;
 }
 
 const TARGET_OPTIONS: { value: PrintTarget; label: string; desc: string }[] = [
@@ -14,9 +17,15 @@ const TARGET_OPTIONS: { value: PrintTarget; label: string; desc: string }[] = [
   { value: 'agreement', label: 'Work Agreement Saja', desc: 'Hanya halaman 2 — Perjanjian kerja' },
 ];
 
-export default function PrintButton({ printTarget, onChangePrintTarget }: PrintButtonProps) {
+export default function PrintButton({
+  printTarget,
+  onChangePrintTarget,
+  variant = 'default',
+  filename,
+}: PrintButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState<PrintTarget>(printTarget);
+  const { downloadPdf, isGenerating } = useDownloadPdf();
 
   function openModal() {
     setSelectedTarget(printTarget);
@@ -26,43 +35,71 @@ export default function PrintButton({ printTarget, onChangePrintTarget }: PrintB
   function handlePrint() {
     onChangePrintTarget(selectedTarget);
     setShowModal(false);
-    // Small delay so React re-renders the data attribute before print dialog opens
     setTimeout(() => window.print(), 80);
   }
 
-  const currentLabel = TARGET_OPTIONS.find((o) => o.value === printTarget)?.label ?? 'Kedua Dokumen';
+  async function handleDownload() {
+    const pdfTarget = variant === 'settlement' ? 'settlement' : printTarget;
+    const defaultName = variant === 'settlement' ? 'settlement.pdf' : `${printTarget}.pdf`;
+    await downloadPdf(pdfTarget, filename ?? defaultName);
+  }
 
   return (
-    <div className="no-print w-full">
+    <div className="no-print w-full flex gap-2">
+      {/* Print button */}
       <button
         onClick={openModal}
-        className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
-        style={{ backgroundColor: '#0F6E56' }}
+        className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors border"
+        style={{ borderColor: '#0F6E56', color: '#0F6E56', backgroundColor: '#fff' }}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
         </svg>
-        Download PDF / Print
-        <span className="ml-1 text-xs font-normal opacity-80">— {currentLabel}</span>
+        Print
       </button>
 
+      {/* Download PDF button */}
+      <button
+        onClick={handleDownload}
+        disabled={isGenerating}
+        className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+        style={{ backgroundColor: '#0F6E56' }}
+      >
+        {isGenerating ? (
+          <>
+            <svg className="w-4 h-4 flex-shrink-0 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+            </svg>
+            Generating...
+          </>
+        ) : (
+          <>
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download PDF
+          </>
+        )}
+      </button>
+
+      {/* Print modal */}
       {showModal && (
         <>
-          {/* Overlay */}
           <div
             className="no-print fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowModal(false)}
           />
-
-          {/* Modal */}
           <div className="no-print fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
             <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-md mx-4 pointer-events-auto">
 
-              {/* Modal header */}
+              {/* Header */}
               <div className="flex items-start justify-between mb-5">
                 <div>
-                  <h3 className="text-base font-semibold text-slate-800">Download / Print PDF</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">Pilih dokumen yang ingin dicetak</p>
+                  <h3 className="text-base font-semibold text-slate-800">Print Dokumen</h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {variant === 'settlement' ? 'Invoice Pelunasan akan dicetak' : 'Pilih dokumen yang ingin dicetak'}
+                  </p>
                 </div>
                 <button
                   onClick={() => setShowModal(false)}
@@ -74,51 +111,48 @@ export default function PrintButton({ printTarget, onChangePrintTarget }: PrintB
                 </button>
               </div>
 
-              {/* Target selector */}
-              <div className="flex flex-col gap-2 mb-5">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Pilih Dokumen</p>
-                {TARGET_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setSelectedTarget(opt.value)}
-                    className="text-left w-full rounded-xl border-2 px-4 py-3 transition-all"
-                    style={
-                      selectedTarget === opt.value
-                        ? { borderColor: '#0F6E56', backgroundColor: '#E1F5EE' }
-                        : { borderColor: '#e2e8f0', backgroundColor: '#ffffff' }
-                    }
-                  >
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0"
-                        style={
-                          selectedTarget === opt.value
-                            ? { borderColor: '#0F6E56' }
-                            : { borderColor: '#cbd5e1' }
-                        }
-                      >
-                        {selectedTarget === opt.value && (
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#0F6E56' }} />
-                        )}
+              {/* Document selector — only for default variant */}
+              {variant === 'default' && (
+                <div className="flex flex-col gap-2 mb-5">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Pilih Dokumen</p>
+                  {TARGET_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setSelectedTarget(opt.value)}
+                      className="text-left w-full rounded-xl border-2 px-4 py-3 transition-all"
+                      style={
+                        selectedTarget === opt.value
+                          ? { borderColor: '#0F6E56', backgroundColor: '#E1F5EE' }
+                          : { borderColor: '#e2e8f0', backgroundColor: '#ffffff' }
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0"
+                          style={selectedTarget === opt.value ? { borderColor: '#0F6E56' } : { borderColor: '#cbd5e1' }}
+                        >
+                          {selectedTarget === opt.value && (
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#0F6E56' }} />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold" style={{ color: selectedTarget === opt.value ? '#0F6E56' : '#334155' }}>
+                            {opt.label}
+                          </p>
+                          <p className="text-xs text-slate-400">{opt.desc}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold" style={{ color: selectedTarget === opt.value ? '#0F6E56' : '#334155' }}>
-                          {opt.label}
-                        </p>
-                        <p className="text-xs text-slate-400">{opt.desc}</p>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
+                    </button>
+                  ))}
+                </div>
+              )}
 
-              {/* Instructions */}
+              {/* Print instructions */}
               <div className="rounded-xl p-3 mb-5" style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                <p className="text-xs font-semibold text-slate-500 mb-2">Petunjuk cetak ke PDF:</p>
+                <p className="text-xs font-semibold text-slate-500 mb-2">Petunjuk cetak:</p>
                 <ol className="flex flex-col gap-1 pl-4 text-xs text-slate-500" style={{ listStyleType: 'decimal' }}>
-                  <li>Pastikan browser dalam mode desktop</li>
-                  <li>Di dialog Print, pilih <strong className="text-slate-700">Save as PDF</strong></li>
+                  <li>Di dialog Print, pilih printer atau <strong className="text-slate-700">Save as PDF</strong></li>
                   <li>Set <strong className="text-slate-700">Paper size: A4</strong></li>
                   <li>Set <strong className="text-slate-700">Margins: Minimum</strong> atau <strong className="text-slate-700">None</strong></li>
                   <li>Aktifkan <strong className="text-slate-700">&quot;Print background graphics&quot;</strong></li>

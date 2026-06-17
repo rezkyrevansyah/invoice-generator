@@ -262,6 +262,7 @@ export default function GeneratorPage() {
           <PrintButton
             printTarget={printTarget}
             onChangePrintTarget={setPrintTarget}
+            filename={`invoice-${formData.invoiceNumber || 'draft'}.pdf`}
           />
         </div>
 
