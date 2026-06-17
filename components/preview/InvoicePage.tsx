@@ -74,12 +74,6 @@ export default function InvoicePage({ data, freelancer }: InvoicePageProps) {
               <td style={CELL_LABEL}>Agreement Date</td>
               <td style={CELL_VALUE}>{formatDateLong(data.agreementDate)}</td>
             </tr>
-            <tr>
-              <td style={CELL_LABEL}>Initial Payment Due</td>
-              <td style={CELL_VALUE}>{formatDateID(data.initialPaymentDue)} <span style={{ color: '#888' }}>(1 hari kerja)</span></td>
-              <td style={CELL_LABEL}>Project Deadline</td>
-              <td style={CELL_VALUE}>{formatDateID(data.projectDeadline)}</td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -128,10 +122,6 @@ export default function InvoicePage({ data, freelancer }: InvoicePageProps) {
             <tr>
               <td style={CELL_LABEL}>Revision Rounds</td>
               <td style={CELL_VALUE}>{data.revisionRounds} kali revisi</td>
-            </tr>
-            <tr>
-              <td style={CELL_LABEL}>Project Duration</td>
-              <td style={CELL_VALUE}>{data.projectDuration} hari kerja</td>
             </tr>
             <tr>
               <td style={CELL_LABEL}>Start Date</td>

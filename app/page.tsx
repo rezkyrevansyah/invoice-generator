@@ -19,7 +19,7 @@ export default function Home() {
         </div>
 
         {/* Pilihan */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Kartu 1: Invoice Baru */}
           <Link
             href="/generator"
@@ -36,7 +36,7 @@ export default function Home() {
             <div>
               <h2 className="text-base font-bold text-slate-800 mb-1">Buat Invoice Baru</h2>
               <p className="text-sm text-slate-500 leading-relaxed">
-                Invoice + Work Agreement untuk proyek baru. Termasuk DP dan deadline.
+                Invoice + Work Agreement untuk proyek baru.
               </p>
             </div>
             <div className="mt-auto flex items-center gap-1 text-sm font-semibold" style={{ color: '#0F6E56' }}>
@@ -63,7 +63,7 @@ export default function Home() {
             <div>
               <h2 className="text-base font-bold text-slate-800 mb-1">Invoice Pelunasan</h2>
               <p className="text-sm text-slate-500 leading-relaxed">
-                Untuk proyek yang sudah dibayar DP 50%. Bisa tambah reimbursement dan bukti gambar.
+                Untuk proyek yang sudah dibayar DP 50%.
               </p>
             </div>
             <div className="mt-auto flex items-center gap-1 text-sm font-semibold" style={{ color: '#0F6E56' }}>
@@ -73,12 +73,32 @@ export default function Home() {
               </svg>
             </div>
           </Link>
-        </div>
 
-        {/* Link ke history */}
-        <div className="text-center mt-6">
-          <Link href="/history" className="text-sm text-slate-400 hover:text-slate-600 transition-colors">
-            Lihat History Invoice →
+          {/* Kartu 3: History Invoice */}
+          <Link
+            href="/history"
+            className="group bg-white rounded-2xl border border-slate-200 p-6 flex flex-col gap-4 hover:border-slate-300 hover:shadow-md transition-all"
+          >
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: '#E1F5EE' }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" style={{ color: '#0F6E56' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-slate-800 mb-1">History Invoice</h2>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                Lihat semua invoice yang sudah tersimpan.
+              </p>
+            </div>
+            <div className="mt-auto flex items-center gap-1 text-sm font-semibold" style={{ color: '#0F6E56' }}>
+              Lihat
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </Link>
         </div>
       </div>
