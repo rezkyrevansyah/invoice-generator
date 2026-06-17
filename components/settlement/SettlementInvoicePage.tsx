@@ -20,18 +20,20 @@ const CELL_LABEL: React.CSSProperties = {
   backgroundColor: '#E1F5EE',
   color: '#085041',
   fontWeight: 600,
-  padding: '5px 10px',
+  padding: '6px 10px',
   fontSize: '11px',
+  lineHeight: '1.5',
   whiteSpace: 'nowrap',
   border: '1px solid #c5e8da',
-  verticalAlign: 'top',
+  verticalAlign: 'middle',
 };
 
 const CELL_VALUE: React.CSSProperties = {
-  padding: '5px 10px',
+  padding: '6px 10px',
   fontSize: '11px',
+  lineHeight: '1.5',
   border: '1px solid #e5e7eb',
-  verticalAlign: 'top',
+  verticalAlign: 'middle',
 };
 
 export default function SettlementInvoicePage({ data, freelancer, previewImageUrls }: Props) {
